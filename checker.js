@@ -6,13 +6,13 @@ function main() {
     Logger.log('Looking for shared files in your drive, please wait... (This may take a while)');
 
     const rootFolder = DriveApp.getRootFolder();
-    files.push(["Path", "Access", "Permissions", "Editors", "Viewers", "Date", "Size", "URL", "Type"]);
+    files.push(["Type", "Path", "Access", "Permissions", "Editors", "Viewers", "Date", "Size", "URL", "Type"]);
     getAllFilesInFolder('', rootFolder);
 
     Logger.log('Found %s shared files, inserting into new sheet...', files.length);
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet();
-    const range = sheet.getRange('A1:I'+files.length);
+    const range = sheet.getRange('A1:J'+files.length);
     range.setValues(files);
     
     Logger.log('%s lines inserted !', files.length);
@@ -23,21 +23,24 @@ function getAllFilesInFolder(parentPath, folder) {
     const folderFiles = folder.getFiles();
     const path = parentPath + '/' + folder.getName();
 
+    addFileOrFolder(parentPath, folder, 'd');
+
     while (subFolders.hasNext()) {
         const folder = subFolders.next();
         getAllFilesInFolder(path, folder);
     }
     while (folderFiles.hasNext()) {
-        addFile(path, folderFiles.next());
+        addFileOrFolder(path, folderFiles.next(), 'f');
     }
 }
 
-function addFile(parentPath, file) {
+function addFileOrFolder(parentPath, file, type) {
     if (checkAllFiles || 'PRIVATE' != file.getSharingAccess()) {
-        const listEditors = file.getEditors().reduce((acc, next) => acc + ', '+ next.getEmail(), '');
-        const listViewers = file.getViewers().reduce((acc, next) => acc + ', '+ next.getEmail(), '');
+        const listEditors = file.getEditors().map(it => it.getEmail()).toString();
+        const listViewers = file.getViewers().map(it => it.getEmail()).toString();
 
         const fileData = [
+            type,
             parentPath + '/' + file.getName(),
             file.getSharingAccess(),
             file.getSharingPermission(),
@@ -46,7 +49,7 @@ function addFile(parentPath, file) {
             file.getDateCreated(),
             file.getSize(),
             file.getUrl(),
-            file.getMimeType(),
+            'f' == type ? file.getMimeType() : '',
         ];
         files.push(fileData);
     }

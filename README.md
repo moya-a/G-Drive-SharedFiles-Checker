@@ -16,13 +16,13 @@ It returns you a Spreadsheet with the files and theirs access rights alongside t
 ## Result
 It creates a new sheet in the spreadsheet that should be populated with the results according to this column format :
 
-| Type | Path | Access | Permissions | Editors | Viewers | Date | Size | URL | Type |
-| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| Path | Access | Permissions | Editors | Viewers | Date | Size | URL | Type |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 
 ## Options
 If you want the script to check all your files (I mean, also files tagged as 'PRIVATE'), you can set :
 ```
-checkAllFiles = true;
+const CHECK_PRIVATE_FILES = true;
 ```
 
 ## Author

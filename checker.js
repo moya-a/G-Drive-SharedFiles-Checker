@@ -1,5 +1,8 @@
 const CHECK_PRIVATE_FILES = false; // change to true if you want to check 'PRIVATE' files
+
 const PRIVATE = 'PRIVATE';
+const FOLDER_TYPE = 'D';
+const FILE_TYPE = 'F';
 
 const resultFiles = [];
 
@@ -27,14 +30,14 @@ function getAllFilesInFolder(parentPath, folder, inherited) {
 
     const isShared = folder.getSharingAccess() != PRIVATE;
 
-    addFileOrFolder(parentPath, folder, 'd', inherited);
+    addFileOrFolder(parentPath, folder, FOLDER_TYPE, inherited);
 
     while (subFolders.hasNext()) {
         const folder = subFolders.next();
         getAllFilesInFolder(path, folder, isShared);
     }
     while (folderFiles.hasNext()) {
-        addFileOrFolder(path, folderFiles.next(), 'f', isShared);
+        addFileOrFolder(path, folderFiles.next(), FILE_TYPE, isShared);
     }
 }
 
@@ -53,7 +56,7 @@ function addFileOrFolder(parentPath, file, type, inheritShare) {
             file.getDateCreated(),
             file.getSize(),
             file.getUrl(),
-            'f' == type ? file.getMimeType() : 'Folder',
+            FILE_TYPE == type ? file.getMimeType() : 'Folder',
         ];
         resultFiles.push(fileData);
     }

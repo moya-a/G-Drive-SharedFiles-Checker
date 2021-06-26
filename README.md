@@ -1,4 +1,4 @@
-# GoogleDrive - Shared Files Checker Script
+# GoogleDrive - Shared Files Finder Script
 
 This script analyses your Google Drive to find all files you've shared.
 
@@ -14,9 +14,10 @@ It returns you a Spreadsheet with the files and theirs access rights alongside t
 - It may asks for permissions that you need to accept in order to access the drive.
 
 ## Result
-The spreadsheet should be populated with the results according to this columns format
+It creates a new sheet in the spreadsheet that should be populated with the results according to this column format :
 
-["Path", "Access", "Permissions", "Editors", "Viewers", "Date", "Size", "URL", "Type"]
+| Type | Path | Access | Permissions | Editors | Viewers | Date | Size | URL | Type |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 
 ## Options
 If you want the script to check all your files (I mean, also files tagged as 'PRIVATE'), you can set :

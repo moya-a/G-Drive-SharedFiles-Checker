@@ -1,6 +1,5 @@
 const CHECK_PRIVATE_FILES = false; // change to true if you want to check 'PRIVATE' files
 
-const PRIVATE = 'PRIVATE';
 const FOLDER_TYPE = 'D';
 const FILE_TYPE = 'F';
 
@@ -11,13 +10,13 @@ function main() {
     Logger.log('Looking for shared files in your drive, please wait... (This may take a while)');
 
     const rootFolder = DriveApp.getRootFolder();
-    resultFiles.push(["Path", "Access", "Permissions", "Editors", "Viewers", "Date", "Size", "URL", "Type"]);
+    resultFiles.push(["Status", "Path", "Access", "Permissions", "Editors", "Viewers", "Date", "Size", "URL", "Type"]);
     getAllFilesInFolder('', rootFolder, false);
 
     Logger.log('Found %s shared files, inserting into new sheet...', resultFiles.length);
 
     const sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet();
-    const range = sheet.getRange('A1:I' + resultFiles.length);
+    const range = sheet.getRange('A1:J' + resultFiles.length);
     range.setValues(resultFiles);
 
     Logger.log('%s lines inserted !', resultFiles.length);
@@ -28,7 +27,13 @@ function getAllFilesInFolder(parentPath, folder, inherited) {
     const folderFiles = folder.getFiles();
     const path = parentPath + '/' + folder.getName();
 
-    const isShared = folder.getSharingAccess() != PRIVATE;
+    var isShared = false;
+
+    try {
+        isShared = folder.getSharingAccess() != DriveApp.Access.PRIVATE;
+    } catch (err) {
+        Logger.log('%s', err)
+    }
 
     addFileOrFolder(parentPath, folder, FOLDER_TYPE, inherited);
 
@@ -42,21 +47,41 @@ function getAllFilesInFolder(parentPath, folder, inherited) {
 }
 
 function addFileOrFolder(parentPath, file, type, inheritShare) {
-    const sharingAccess = file.getSharingAccess();
-    if (CHECK_PRIVATE_FILES || inheritShare || PRIVATE != sharingAccess) {
-        const listEditors = file.getEditors().map(it => it.getEmail()).toString();
-        const listViewers = file.getViewers().map(it => it.getEmail()).toString();
+    const filePath = parentPath + '/' + file.getName();
 
+    try {
+        const sharingAccess = file.getSharingAccess();
+        if (CHECK_PRIVATE_FILES || inheritShare || DriveApp.Access.PRIVATE != sharingAccess) {
+            const listEditors = file.getEditors().map(it => it.getEmail()).toString();
+            const listViewers = file.getViewers().map(it => it.getEmail()).toString();
+
+            const fileData = [
+                'ok',
+                filePath,
+                sharingAccess + (inheritShare ? ' (inherited)' : ''),
+                file.getSharingPermission(),
+                listEditors,
+                listViewers,
+                file.getDateCreated(),
+                file.getSize(),
+                file.getUrl(),
+                FILE_TYPE == type ? file.getMimeType() : 'Folder',
+            ];
+            resultFiles.push(fileData);
+        }
+    } catch (err) {
+        Logger.Log('Error while analyzing file %s : %s', filePath, err)
         const fileData = [
-            parentPath + '/' + file.getName(),
-            sharingAccess + (inheritShare ? ' (inherited)' : ''),
-            file.getSharingPermission(),
-            listEditors,
-            listViewers,
-            file.getDateCreated(),
-            file.getSize(),
-            file.getUrl(),
-            FILE_TYPE == type ? file.getMimeType() : 'Folder',
+            err,
+            filePath,
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
         ];
         resultFiles.push(fileData);
     }

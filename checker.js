@@ -70,7 +70,7 @@ function addFileOrFolder(parentPath, file, type, inheritShare) {
             resultFiles.push(fileData);
         }
     } catch (err) {
-        Logger.Log('Error while analyzing file %s : %s', filePath, err)
+        Logger.log('Error while analyzing file %s : %s', filePath, err)
         const fileData = [
             err,
             filePath,
